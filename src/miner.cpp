@@ -189,8 +189,10 @@ BlockAssembler::CreateNewBlock(const CScript &scriptPubKeyIn) {
     coinbaseTx.vin[0].prevout = COutPoint();
     coinbaseTx.vout.resize(1);
     coinbaseTx.vout[0].scriptPubKey = scriptPubKeyIn;
+    int shortSpacingHeight;
+	bool shortSpacingEn = IsShortSpacingEnabled(*config, nHeight, &shortSpacingHeight);
     coinbaseTx.vout[0].nValue =
-        nFees + GetBlockSubsidy(nHeight, chainparams.GetConsensus());
+        nFees + GetBlockSubsidy(nHeight, chainparams.GetConsensus(), shortSpacingHeight, shortSpacingEn);
     coinbaseTx.vin[0].scriptSig = CScript() << nHeight << OP_0;
 
     // Make sure the coinbase is big enough.

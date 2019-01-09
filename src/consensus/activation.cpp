@@ -48,3 +48,42 @@ bool IsMagneticAnomalyEnabled(const Config &config,
 
     return IsMagneticAnomalyEnabled(config, pindexPrev->GetMedianTimePast());
 }
+
+bool IsGreatWallEnabled(const Config &config, int64_t nMedianTimePast) {
+    return nMedianTimePast >= gArgs.GetArg("-greatwallactivationtime",
+                                           config.GetChainParams()
+                                               .GetConsensus()
+                                               .greatWallActivationTime);
+}
+
+bool IsGreatWallEnabled(const Config &config,
+                              const CBlockIndex *pindexPrev) {
+    if (pindexPrev == nullptr) {
+        return false;
+    }
+
+	return IsGreatWallEnabled(config, pindexPrev->GetMedianTimePast());
+}
+
+bool IsShortSpacingEnabled(const Config &config,
+                              const int height,
+							  int *shortSpacingHeight) {
+
+	int heightExt = gArgs.GetArg("-shortspacingactivationheight", 0);
+	int heightInt = config.GetChainParams().GetConsensus().shortSpacingHeight;
+	if (heightExt) {
+		if (shortSpacingHeight != nullptr)
+			*shortSpacingHeight = heightExt;
+		return height >= heightExt;
+	}
+	else if (heightInt) {
+		if (shortSpacingHeight != nullptr)
+			*shortSpacingHeight = heightInt;
+		return height >= heightInt;
+	}
+	else {
+		if (shortSpacingHeight != nullptr)
+			*shortSpacingHeight = 0;
+		return false;
+	}
+}

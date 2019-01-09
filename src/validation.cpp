@@ -898,17 +898,35 @@ bool ReadBlockFromDisk(CBlock &block, const CBlockIndex *pindex,
     return true;
 }
 
-Amount GetBlockSubsidy(int nHeight, const Consensus::Params &consensusParams) {
-    int halvings = nHeight / consensusParams.nSubsidyHalvingInterval;
-    // Force block reward to zero when right shift is undefined.
-    if (halvings >= 64) {
-        return Amount::zero();
-    }
+Amount GetBlockSubsidy(int nHeight, const Consensus::Params &consensusParams,
+					   int shortSpacingHeight, bool shortSpacingEn) {
+	int factor = 1;
+	if (shortSpacingEn) {
+		int nextHalvingBlock = shortSpacingHeight / consensusParams.nSubsidyHalvingInterval;
+		nextHalvingBlock = consensusParams.nSubsidyHalvingInterval * (nextHalvingBlock + 1);
+		int specialHalvingBlock = shortSpacingHeight + 
+								 (nextHalvingBlock - shortSpacingHeight)
+								  * consensusParams.nShortSpacingFactor;
+		if (nHeight < specialHalvingBlock) {
+			nHeight = nextHalvingBlock - 1;
+		}
+		else {
+			nHeight = (nHeight - specialHalvingBlock) / consensusParams.nShortSpacingFactor;
+			nHeight += nextHalvingBlock;
+		}
+		factor = consensusParams.nShortSpacingFactor;
+	}
+	
+	int halvings = nHeight / consensusParams.nSubsidyHalvingInterval;
+	// Force block reward to zero when right shift is undefined.
+	if (halvings >= 64) {
+		return Amount::zero();
+	}
 
-    Amount nSubsidy = 50 * COIN;
-    // Subsidy is cut in half every 210,000 blocks which will occur
-    // approximately every 4 years.
-    return ((nSubsidy / SATOSHI) >> halvings) * SATOSHI;
+	Amount nSubsidy = 50 * COIN;
+	// Subsidy is cut in half every 210,000 blocks which will occur
+	// approximately every 4 years.
+	return ((nSubsidy / SATOSHI) >> halvings) * SATOSHI / factor;
 }
 
 bool IsInitialBlockDownload() {
@@ -1805,8 +1823,10 @@ static bool ConnectBlock(const Config &config, const CBlock &block,
              nInputs <= 1 ? 0 : 0.001 * (nTime3 - nTime2) / (nInputs - 1),
              nTimeConnect * 0.000001);
 
+    int shortSpacingHeight;
+	bool shortSpacingEn = IsShortSpacingEnabled(config, pindex->nHeight, &shortSpacingHeight);
     Amount blockReward =
-        nFees + GetBlockSubsidy(pindex->nHeight, consensusParams);
+        nFees + GetBlockSubsidy(pindex->nHeight, consensusParams, shortSpacingHeight, shortSpacingEn);
     if (block.vtx[0]->GetValueOut() > blockReward) {
         return state.DoS(100, error("ConnectBlock(): coinbase pays too much "
                                     "(actual=%d vs limit=%d)",

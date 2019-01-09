@@ -99,6 +99,11 @@ public:
         // two weeks
         consensus.nPowTargetTimespan = 14 * 24 * 60 * 60;
         consensus.nPowTargetSpacing = 10 * 60;
+		consensus.nPowTargetShortSpacing = 2 * 60;
+		// nPowTargetSpacing / nPowTargetShortSpacing
+		consensus.nShortSpacingFactor = 5;
+		// Approximate 240 blocks after greatWallActivationTime
+		consensus.shortSpacingHeight = 582910;
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
         // 95% of 2016
@@ -270,6 +275,11 @@ public:
         // two weeks
         consensus.nPowTargetTimespan = 14 * 24 * 60 * 60;
         consensus.nPowTargetSpacing = 10 * 60;
+		consensus.nPowTargetShortSpacing = 2 * 60;
+		// nPowTargetSpacing / nPowTargetShortSpacing
+		consensus.nShortSpacingFactor = 5;
+		// Approximate 240 blocks after greatWallActivationTime
+		consensus.shortSpacingHeight = 1296290;
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = false;
         // 75% for testchains
@@ -395,6 +405,10 @@ public:
         // two weeks
         consensus.nPowTargetTimespan = 14 * 24 * 60 * 60;
         consensus.nPowTargetSpacing = 10 * 60;
+		consensus.nPowTargetShortSpacing = 2 * 60;
+		// nPowTargetSpacing / nPowTargetShortSpacing
+		consensus.nShortSpacingFactor = 5;
+		consensus.shortSpacingHeight = 0;
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = true;
         // 75% for testchains

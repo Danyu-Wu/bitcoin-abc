@@ -204,6 +204,43 @@ static arith_uint256 ComputeTarget(const CBlockIndex *pindexFirst,
 }
 
 /**
+ * Compute a target based on the work done between 2 blocks and the time
+ * required to produce that work after the GreatWall enabled.
+ */
+static arith_uint256 ComputeTargetShort(const CBlockIndex *pindexFirst,
+                                   const CBlockIndex *pindexLast,
+                                   const Consensus::Params &params) {
+    assert(pindexLast->nHeight > pindexFirst->nHeight);
+
+    /**
+     * From the total work done and the time it took to produce that much work,
+     * we can deduce how much work we expect to be produced in the targeted time
+     * between blocks.
+     */
+    arith_uint256 work = pindexLast->nChainWork - pindexFirst->nChainWork;
+    work *= params.nPowTargetShortSpacing;
+
+    // In order to avoid difficulty cliffs, we bound the amplitude of the
+    // adjustment we are going to do to a factor in [0.5, 2].
+    int64_t nActualTimespan =
+        int64_t(pindexLast->nTime) - int64_t(pindexFirst->nTime);
+    if (nActualTimespan > 288 * params.nPowTargetShortSpacing) {
+        nActualTimespan = 288 * params.nPowTargetShortSpacing;
+    } else if (nActualTimespan < 72 * params.nPowTargetShortSpacing) {
+        nActualTimespan = 72 * params.nPowTargetShortSpacing;
+    }
+
+    work /= nActualTimespan;
+
+    /**
+     * We need to compute T = (2^256 / W) - 1 but 2^256 doesn't fit in 256 bits.
+     * By expressing 1 as W / W, we get (2^256 - W) / W, and we can compute
+     * 2^256 - W as the complement of W.
+     */
+    return (-work) / work;
+}
+
+/**
  * To reduce the impact of timestamp manipulation, we select the block we are
  * basing our computation on via a median of 3.
  */
@@ -279,7 +316,9 @@ uint32_t GetNextCashWorkRequired(const CBlockIndex *pindexPrev,
 
     // Compute the target based on time and work done during the interval.
     const arith_uint256 nextTarget =
-        ComputeTarget(pindexFirst, pindexLast, params);
+        IsGreatWallEnabled(config, pindexPrev)
+		? ComputeTargetShort(pindexFirst, pindexLast, params)
+		: ComputeTarget(pindexFirst, pindexLast, params);
 
     const arith_uint256 powLimit = UintToArith256(params.powLimit);
     if (nextTarget > powLimit) {

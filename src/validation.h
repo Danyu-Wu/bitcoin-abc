@@ -419,7 +419,8 @@ bool GetTransaction(const Config &config, const TxId &txid, CTransactionRef &tx,
 bool ActivateBestChain(
     const Config &config, CValidationState &state,
     std::shared_ptr<const CBlock> pblock = std::shared_ptr<const CBlock>());
-Amount GetBlockSubsidy(int nHeight, const Consensus::Params &consensusParams);
+Amount GetBlockSubsidy(int nHeight, const Consensus::Params &consensusParams,
+					   int shortSpacingHeight, bool shortSpacingEn);
 
 /**
  * Guess verification progress (as a fraction between 0.0=genesis and

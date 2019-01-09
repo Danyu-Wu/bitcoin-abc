@@ -25,4 +25,17 @@ bool IsMagneticAnomalyEnabled(const Config &config,
  */
 bool IsMagneticAnomalyEnabled(const Config &config, int64_t nMedianTimePast);
 
+/** Check if May 15, 2019 HF has activated. */
+bool IsGreatWallEnabled(const Config &config,
+                              const CBlockIndex *pindexPrev);
+/**
+ * Also check if May 15, 2019 HF has activated, but with an API that isn't as
+ * safe.
+ */
+bool IsGreatWallEnabled(const Config &config, int64_t nMedianTimePast);
+
+/** Check if May 15, 2019 shortSpacing HF has activated. */
+bool IsShortSpacingEnabled(const Config &config, const int height,
+						   int *shortSpacingHeight);
+
 #endif // BITCOIN_CONSENSUS_ACTIVATION_H
