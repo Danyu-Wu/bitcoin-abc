@@ -15,8 +15,10 @@
 的用户占比高达98.88%，缩短区块时间可以大幅提升用户体验，可以带来更多的用户。
 
 本程序包括2种共识修改：
+
 1、出块时间从10分钟修改为2分钟，默认2019年5月激活，可通过在bitcoin.conf中加入
 “greatwallactivationtime=时间戳” 语句的方式提前激活，用于测试；
+
 2、区块奖励自分叉时起降低为1/5，节点程序为保持BCH发行总量不变，采用了按照高度
 激活的方式，可通过在bitcoin.conf中加入“shortspacingactivationheight=激活高度”
 语句的方式提前激活，默认值为582910，大约是5月份基于时间戳的硬分叉激活后的第240
@@ -25,14 +27,23 @@
 如何运行
 ---------------------
 运行以下语句配置编译环境
+
 $ ./autogen.sh
+
 $ ./configure --prefix=/your_install_path --disable-gui --disable-tests
+
 然后运行以下语句编译&安装
+
 $ make && make install
+
 最后进入安装目录运行BCH客户端
+
 $ ./bitcoind -daemon
+
 或
+
 $ ./bitcoind -testnet -daemon
+
 注意如果需要提前激活分叉，需要提前配置好bitcoin.conf文件
 
 [Bitcoin ABC](https://www.bitcoinabc.org)
