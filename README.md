@@ -7,6 +7,8 @@
 
 关于出块时间，已有不少BCH持有者进行了[签名投票](http://votes.cash/)，结果显示支持缩短区块时间的用户占比高达98.88%，缩短区块时间可以大幅提升用户体验，从而带来更多用户。
 
+Join the discussion at : [Telegram Group](https://t.me/joinchat/HU6w6A2xyARCUvq6xLKqXQ)
+
 本程序包括2种共识修改：
 
 1、出块时间从10分钟修改为2分钟，默认2019年5月激活，可通过在bitcoin.conf中加入“greatwallactivationtime=时间戳” 语句的方式提前激活，用于测试；
